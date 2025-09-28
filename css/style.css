@@ -35,7 +35,14 @@ body {
 }
 
 .bg {
-    background: #E9E9E9 url(../images/background.png) 50% 0;
+    /*
+     * 主要修改点:
+     * 1. 将 background-position 改为 center center (50% 50%) 使图片居中。
+     * 2. 添加 background-size: cover; 让图片等比缩放并铺满整个容器。
+     * 3. 添加 background-repeat: no-repeat; 防止图片平铺。
+     */
+    background: #E9E9E9 url(../images/background.png) center center no-repeat;
+    background-size: cover;
     -webkit-transform: translate3d(0, 0, 0);
     transform: translate3d(0, 0, 0);
     -webkit-animation: flow 5s linear infinite;
@@ -149,7 +156,8 @@ body {
     -webkit-box-shadow: inset 0 1px #FFD17C, 0 2px 3px rgba(0, 0, 0, 0.2);
     box-shadow: inset 0 1px #FFD17C, 0 2px 3px rgba(0, 0, 0, 0.2);
     border: 1px solid #E88E1D;
-    border-radius: 35px; /* 覆盖上面的 40px */
+    border-radius: 35px;
+    /* 覆盖上面的 40px */
 }
 
 #start:hover {
