@@ -3,15 +3,13 @@ document.addEventListener("DOMContentLoaded", () => {
     let randomTimeout;
     let currentMode = "android";
     let resetCount = 0;
-    
     let currentOrder = 1; // 0: 午餐, 1: 晚餐
-    
     let screenWidth, screenHeight;
     let currentFoodPool = [];
 
+    let hasClickedTitle = false;
+
     const foodPools = {};
-    
-    // --- 修改 2: mealNames 数组移除 breakfast ---
     const mealNames = ["lunch", "dinner"];
 
     // 元素选择
@@ -30,19 +28,15 @@ document.addEventListener("DOMContentLoaded", () => {
     // --- 初始化 ---
     function initialize() {
         const currentHour = new Date().getHours();
-
-        // --- 修改 3: 更新时间判断逻辑，只设置 0 (午餐) 或 1 (晚餐) ---
         if (currentHour >= 13 && currentHour < 23) {
             currentOrder = 1; // 晚餐
         } else {
             currentOrder = 0; // 其他时间默认为午餐
         }
-
         updateMealForCurrentOrder(currentOrder);
         selectMealPoolBasedOnMode();
         updateScreenSize();
         setupEventListeners();
-        
         updateColorBlockPosition(document.querySelector("#toggle button.selected"));
     }
 
@@ -65,7 +59,6 @@ document.addEventListener("DOMContentLoaded", () => {
     function handleStartStop() {
         body.classList.toggle("playing", !isPlaying);
         isPlaying = !isPlaying;
-
         if (isPlaying) {
             handleTeases(++resetCount);
             resetTitle();
@@ -81,8 +74,9 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function handleTitleClick() {
-        // --- 修改 4: 切换逻辑改为 % 2，只在 0 和 1 之间循环 ---
-        currentOrder = (currentOrder + 1) % 2; 
+        hasClickedTitle = true;
+
+        currentOrder = (currentOrder + 1) % 2;
         updateMealForCurrentOrder(currentOrder);
         selectMealPoolBasedOnMode();
     }
@@ -91,9 +85,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const selectedButton = e.target;
         toggleButtons.forEach(btn => btn.classList.remove("selected"));
         selectedButton.classList.add("selected");
-        
         updateColorBlockPosition(selectedButton);
-
         currentMode = selectedButton.dataset.type;
         selectMealPoolBasedOnMode();
         resetCount = 0;
@@ -104,7 +96,6 @@ document.addEventListener("DOMContentLoaded", () => {
         const blockWidth = selectedButton.offsetWidth;
         const blockLeft = selectedButton.offsetLeft;
         const blockTop = selectedButton.offsetTop;
-
         colorBlock.style.width = `${blockWidth}px`;
         colorBlock.style.left = `${blockLeft}px`;
         colorBlock.style.top = `${blockTop}px`;
@@ -121,7 +112,6 @@ document.addEventListener("DOMContentLoaded", () => {
             currentFoodPool = foodPools[currentMode][mealName] || [];
             return;
         }
-
         try {
             const response = await fetch(`./food/${currentMode}.json`);
             const data = await response.json();
@@ -147,7 +137,6 @@ document.addEventListener("DOMContentLoaded", () => {
         function displayRandomFood() {
             const foodItem = currentFoodPool[Math.floor(Math.random() * currentFoodPool.length)];
             what.textContent = foodItem;
-            
             const tempElement = document.createElement("span");
             tempElement.className = "temp";
             tempElement.textContent = foodItem;
@@ -156,7 +145,6 @@ document.addEventListener("DOMContentLoaded", () => {
             tempElement.style.fontSize = `${Math.floor(Math.random() * (37 - 14 + 1)) + 14}px`;
             tempElement.style.color = `rgba(0,0,0,${(Math.random() * 0.4 + 0.3).toFixed(1)})`;
             tempContainer.append(tempElement);
-            
             randomTimeout = setTimeout(displayRandomFood, 60);
         }
         displayRandomFood();
@@ -164,13 +152,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // --- UI/UX 辅助函数 ---
     function updateMealForCurrentOrder(order) {
-        // --- 修改 5: mealTimes 数组现在和索引 0, 1 正确对应 ---
-        const mealTimes = ["午饭", "晚饭"]; 
+        const mealTimes = ["午饭", "晚饭"];
         if (!isPlaying) {
             timeSpan.textContent = mealTimes[order];
             resetTitle();
             resetCount = 0;
-            if (tip) {
+            if (tip && !hasClickedTitle) {
                 tip.style.display = 'block';
                 setTimeout(() => tip && (tip.style.display = 'none'), 4000);
             }
