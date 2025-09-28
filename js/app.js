@@ -3,12 +3,16 @@ document.addEventListener("DOMContentLoaded", () => {
     let randomTimeout;
     let currentMode = "android";
     let resetCount = 0;
-    let currentOrder = 2; // 0: 早餐, 1: 午餐, 2: 晚餐
+    
+    let currentOrder = 1; // 0: 午餐, 1: 晚餐
+    
     let screenWidth, screenHeight;
     let currentFoodPool = [];
 
     const foodPools = {};
-    const mealNames = ["breakfast", "lunch", "dinner"];
+    
+    // --- 修改 2: mealNames 数组移除 breakfast ---
+    const mealNames = ["lunch", "dinner"];
 
     // 元素选择
     const body = document.body;
@@ -26,12 +30,12 @@ document.addEventListener("DOMContentLoaded", () => {
     // --- 初始化 ---
     function initialize() {
         const currentHour = new Date().getHours();
-        if (currentHour < 9 || currentHour >= 23) {
-            currentOrder = 0;
-        } else if (currentHour < 13) {
-            currentOrder = 1;
+
+        // --- 修改 3: 更新时间判断逻辑，只设置 0 (午餐) 或 1 (晚餐) ---
+        if (currentHour >= 13 && currentHour < 23) {
+            currentOrder = 1; // 晚餐
         } else {
-            currentOrder = 2;
+            currentOrder = 0; // 其他时间默认为午餐
         }
 
         updateMealForCurrentOrder(currentOrder);
@@ -39,7 +43,6 @@ document.addEventListener("DOMContentLoaded", () => {
         updateScreenSize();
         setupEventListeners();
         
-        // 初始化色块位置
         updateColorBlockPosition(document.querySelector("#toggle button.selected"));
     }
 
@@ -78,7 +81,8 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function handleTitleClick() {
-        currentOrder = (currentOrder + 1) % 3;
+        // --- 修改 4: 切换逻辑改为 % 2，只在 0 和 1 之间循环 ---
+        currentOrder = (currentOrder + 1) % 2; 
         updateMealForCurrentOrder(currentOrder);
         selectMealPoolBasedOnMode();
     }
@@ -121,7 +125,6 @@ document.addEventListener("DOMContentLoaded", () => {
         try {
             const response = await fetch(`./food/${currentMode}.json`);
             const data = await response.json();
-            // 数据去重
             for (const key in data) {
                 data[key] = [...new Set(data[key])];
             }
@@ -129,7 +132,7 @@ document.addEventListener("DOMContentLoaded", () => {
             currentFoodPool = foodPools[currentMode][mealName] || [];
         } catch (error) {
             console.error(`Error loading ${currentMode}.json:`, error);
-            currentFoodPool = []; // 出错时清空
+            currentFoodPool = [];
         }
     }
 
@@ -137,7 +140,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!currentFoodPool || currentFoodPool.length === 0) {
             what.textContent = "没得选";
             punctuation.textContent = "QAQ";
-            if (isPlaying) handleStartStop(); // 自动停止
+            if (isPlaying) handleStartStop();
             return;
         }
 
@@ -161,7 +164,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // --- UI/UX 辅助函数 ---
     function updateMealForCurrentOrder(order) {
-        const mealTimes = ["早饭", "午饭", "晚饭"];
+        // --- 修改 5: mealTimes 数组现在和索引 0, 1 正确对应 ---
+        const mealTimes = ["午饭", "晚饭"]; 
         if (!isPlaying) {
             timeSpan.textContent = mealTimes[order];
             resetTitle();
