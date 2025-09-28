@@ -36,17 +36,13 @@ body {
 
 .bg {
     /*
-     * 主要修改点:
-     * 1. 将 background-position 改为 center center (50% 50%) 使图片居中。
-     * 2. 添加 background-size: cover; 让图片等比缩放并铺满整个容器。
-     * 3. 添加 background-repeat: no-repeat; 防止图片平铺。
+     * 1. 使用 background 简写属性将图片居中且不重复。
+     * 2. 使用 background-size: cover; 让图片铺满屏幕。
+     * 3. 删除了 animation 属性来停止滚动。
      */
     background: #E9E9E9 url(../images/background.png) center center no-repeat;
     background-size: cover;
-    -webkit-transform: translate3d(0, 0, 0);
-    transform: translate3d(0, 0, 0);
-    -webkit-animation: flow 5s linear infinite;
-    animation: flow 5s linear infinite;
+    
     position: fixed;
     top: 0;
     left: 0;
@@ -55,10 +51,8 @@ body {
     z-index: -1
 }
 
-.playing .bg {
-    -webkit-animation-play-state: paused;
-    animation-play-state: paused
-}
+/* playing .bg 规则不再需要，因为没有动画可以暂停了 */
+/* .playing .bg { ... } */
 
 #wrapper {
     width: 90%;
@@ -424,25 +418,7 @@ body {
     }
 }
 
-@-webkit-keyframes flow {
-    0% {
-        background-position: 50% 0
-    }
-
-    100% {
-        background-position: 50% -250px
-    }
-}
-
-@keyframes flow {
-    0% {
-        background-position: 50% 0
-    }
-
-    100% {
-        background-position: 50% -250px
-    }
-}
+/* @keyframes flow 动画定义已被删除 */
 
 @-webkit-keyframes flash {
     0% {
